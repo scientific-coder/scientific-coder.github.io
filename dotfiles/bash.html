@@ -1,0 +1,455 @@
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><meta name="description" /><meta content="linux bash" name="keywords" /><meta content="Celia Sherman Akkaya" name="author" /><link href="/images/favicon.ico" rel="icon" type="image/x-icon" /><link href="/images/favicon.ico" rel="shortcut icon" type="image/x-icon" /><link href="/default.css" rel="stylesheet" type="text/css" /><link href="/rss-feed" rel="alternate" title="Santa Rosa Day Care" type="application/rss+xml" /><script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script><title>Bash Configuration</title></head><body><div id="wrap"><div id="header"><h1><a href="/">Santa Rosa Day Care<span class="fade-small"> by Celia Sherman</span></a></h1><div class="pages"><a class="page" href="/">Home</a> | <a class="page" href="/archives.html">Archives</a> | <a class="page" href="/tags/">Tags</a> | <a class="page" href="/contact.html" rel="author">About</a><form action="http://www.google.com/search" id="searchform" method="get"><div><input class="box" id="s" name="q" type="text" /><input name="sitesearch" type="hidden" value="santarosa-daycare.com" /></div></form></div></div><div id="content"><div id="post"><h2 class="page-title">Bash Configuration</h2><div class="org-src-container">
+
+<pre class="src src-sh">export HISTSIZE=100000 SAVEHIST=100000
+# avoid duplicates..
+HISTCONTROL='ignoreboth:erasedups'
+# append history entries..
+shopt -s histappend
+
+# After each command, save and reload history
+export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">case `id -u` in
+    0) PROM="#";;
+    *) PROM="$";;
+esac
+
+export PS1='\[\e[0;32m\]\h \[\e[0;33m\]\W/$(__git_ps1 "(%s)")\[\e[0;31m\] $PROM\[\e[m\] '
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">case "$TERM" in
+    screen*)
+	export TERM=screen-256color
+	;;
+esac
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">PATH=$PATH:/opt/local/bin
+PATH=$PATH:/opt/local/sbin
+PATH=$PATH:/opt/local/sbin
+PATH=$PATH:~/Apps/git-annex.linux/
+PATH=$PATH:~/source/bash
+PATH=$PATH:~/.bin/
+PATH=$PATH:~/.bin/bin/
+PATH=$PATH:/Applications/git-annex.app/Contents/MacOS
+PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
+export PATH
+
+export LC_ALL=en_US.UTF-8  
+export LANG=en_US.UTF-8
+
+source ~/.bin/sftpfs_comp
+source ~/.bin/vm_comp
+
+if [ -f /etc/bash_completion.d/git-prompt ];
+then
+    source /etc/bash_completion.d/git-prompt
+fi
+
+if [ -f /usr/share/bash-completion/completions/git ];
+then
+    source /usr/share/bash-completion/completions/git
+fi
+
+if [ -f /etc/bash_completion.d/git ];
+then
+    source /etc/bash_completion.d/git
+fi
+
+if which brew &gt;/dev/null; then
+    if [ -f $(brew --prefix)/etc/bash_completion ]; then
+	. $(brew --prefix)/etc/bash_completion
+    fi
+fi
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">  function finder (){
+      case "$OSTYPE" in
+	  linux-gnu)
+	      nautilus --no-desktop --browser "$1" &gt; /dev/null 2&gt;&amp;1 &amp;
+	      ;;
+	  darwin*)
+	      open .
+	      ;;
+      esac
+  }
+
+  alias ta='TERM=xterm-256color tmux attach -t default || TERM=xterm-256color tmux new-session -s default'
+  function tmux-ssh (){
+      printf '\033k%s\033\\' $1
+      ssh $1 -t "tmux attach"
+  }
+
+  alias df="df -h"
+  alias g='git'
+  alias ga='git annex'
+  alias gpush="anx;m push;src;m push"
+  alias gpull="anx;m pull;src;m pull"
+  alias gst="anx;m st;src;m st"
+  alias m='mr'
+  alias rm='rm -i'
+  alias rcp='rsync -arvL --progress'
+  alias ssl-ref='cd ~/ &amp;&amp; /usr/bin/sslrefbox &amp;&gt;/dev/null &amp;'
+  alias ssl-sim='cd ~/Apps/grSim/bin/ &amp;&amp; ~/Apps/grSim/bin/grSim &amp;&gt;/dev/null &amp;'
+  alias ssl-vis='cd ~/Apps/ssl-vision/ &amp;&amp; ./bin/vision &amp;&gt;/dev/null &amp;'
+  alias ssl-cli='cd ~/Apps/ssl-vision/ &amp;&amp; ./bin/client'
+  alias ssl-gra-cli='cd ~/Apps/ssl-vision/ &amp;&amp; ./bin/graphicalClient &amp;&gt;/dev/null &amp;' 
+  alias android-sim='cd ~/Apps/adt-bundle-linux-x86_64-20130917/sdk/tools &amp;&amp; ./emulator'
+  alias android-logcat='cd ~/Apps/adt-bundle-linux-x86_64-20130917/sdk/platform-tools &amp;&amp; ./adb logcat -c &amp;&amp; ./adb logcat'
+  alias droid-build='lein do droid build, droid apk'
+  alias droid-install='lein do droid install, droid run'
+  alias droid-deploy='lein do droid build, droid apk &amp;&amp; s3cmd put target/latte-debug.apk s3://dropbox.nakkaya.com/latte-debug.apk'
+  alias latte-ports='lein droid forward-port &amp;&amp; ~/Apps/adt-bundle-linux-x86_64-20130917/sdk/platform-tools/adb forward tcp:8080 tcp:8080'
+  alias wow='cd ~/wow &amp;&amp; wine Wow.exe'
+  alias cljsc='~/Dropbox/kiler/clojurescript/bin/cljsc'
+  alias servedir='python -m SimpleHTTPServer'
+  alias tc='truecrypt'
+  # Get readable list of network IPs
+  alias ips="ifconfig -a | perl -nle'/(\d+\.\d+\.\d+\.\d+)/ &amp;&amp; print $1'"
+  alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
+  alias flush="dscacheutil -flushcache" # Flush DNS cache
+  alias pgrep="ps ax | grep -i"
+  alias hgrep="history | grep -i"
+  alias ag="sudo apt-get"
+  alias cls="clear"
+  alias br="sudo service bluetooth restart"
+  alias vpn="cd ~/Dropbox/bash &amp;&amp; sudo ./vpn.sh"
+  alias youtube-dl-1080="youtube-dl -f 37"
+  alias youtube-dl-720="youtube-dl -f 22"
+  alias sbuild="java -jar static-app.jar --build"
+  alias sjetty="java -jar static-app.jar --jetty"
+  alias ssh-x='ssh -c arcfour,blowfish-cbc -XC' 
+  alias du="du -hcs"
+
+  alias t-server="transmission-daemon -c /media/nakkaya/yesim/torrent/ --incomplete-dir /media/nakkaya/yesim/torrent/incomplete/ --download-dir /media/nakkaya/yesim/torrent/ --no-auth"
+  alias t-cli="transmission-remote-cli"
+  alias s3sync="s3cmd sync --delete --acl-public"
+  alias annex-size="s3cmd du -H s3://cloud-`git config remote.cloud.annex-uuid`"
+
+  alias tor="~/Apps/tor/App/tor"
+
+  alias bootstrap_new_machine="wget -qO- https://raw.github.com/nakkaya/nakkaya.com/master/resources/site/dotfiles/bootstrap.sh | bash"
+
+ga_enc_mount(){
+    CUR_DIR=`pwd`
+    cd "$1"
+    DIR=$(basename "$1")
+    mkdir "/Volumes/$DIR"
+    git annex unlock "."
+    encfs "$CUR_DIR/${1}" "/Volumes/$DIR"
+    cd $CUR_DIR
+}
+
+ga_enc_umount(){
+    CUR_DIR=`pwd`
+    DIR=$(basename "$1")
+    if umount "/Volumes/$DIR"; then
+	rm -rf "/Volumes/$DIR"
+    fi
+    cd "$1"
+    git annex add .
+    git commit -m 'Update'
+    cd $CUR_DIR
+}
+</pre>
+</div>
+
+<p>
+Autocomplete for 'g' as well,
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">complete -o default -o nospace -F _git g
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">if [ -f ~/.ssh/config ];
+then
+    function _ssh_completion() {
+	perl -ne 'print "$1 " if /^[Hh]ost (.+)$/' ~/.ssh/config
+    }
+    complete -W "$(_ssh_completion)" ssh
+    complete -W "$(_ssh_completion)" tmux-ssh
+    complete -W "$(_ssh_completion)" autossh
+fi
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">if [ -f ~/.mrconfig ];
+then
+    function _mr_completion() {
+	perl -ne 'print "$1 " if /^git_(.+)\s+=/' ~/.mrconfig
+    }
+    complete -W "$(_mr_completion)" mr
+    complete -W "$(_mr_completion)" m
+fi
+
+if [ -d /media/nakkaya ];
+then
+
+    case "$OSTYPE" in
+	linux-gnu)
+	    usb_mount_point="/media/nakkaya"
+	    ;;
+	darwin*)
+	    usb_mount_point="/Volumes"
+	    ;;
+    esac
+
+    usb(){
+	if [ -d "$usb_mount_point/${1}/kiler" ];
+	then
+	    cd "$usb_mount_point/${1}/kiler"
+	else
+	    cd "$usb_mount_point/${1}/"
+	fi
+    }
+    complete -W "`cd /media/nakkaya/;compgen -A directory`" usb
+fi
+
+src() {
+    eval "cd ~/source/${1}"
+}
+complete -W "`cd ~/source/;compgen -A directory`" src
+
+anx() {
+    eval "cd ~/annex/${1}"
+}
+complete -W "`cd ~/annex/;compgen -A directory`" anx
+
+runx () {
+    DISPLAY=:0.0 ${1} &amp;
+}
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">case "$OSTYPE" in
+    cygwin)
+	alias open="cmd /c start"
+	alias ls="ls -aG --color"
+	export PATH="$PATH:/cygdrive/c/Dropbox/bash"
+	clear () { command.COM /c cls;}
+	export -f clear
+	;;
+    linux-gnu)
+	alias open="gnome-open"
+	alias ls="ls -aG --color"
+	alias emacs-nx='emacs &amp;&gt; /dev/null &amp;'
+	alias emacs="TERM=xterm-256color emacsclient -t || TERM=xterm-256color emacs -nw"
+	;;
+    darwin*)
+	alias ls="ls -aG"
+	alias emacs="env TERM=xterm-256color /Applications/Emacs.app/Contents/MacOS/Emacs -nw"
+	export CLOJURESCRIPT_HOME=/Users/nakkaya/Dropbox/kiler/clojurescript/
+	alias open="open"
+	;;
+esac
+
+HOST=$(hostname)
+
+if [ "${HOST}" == "kocatepe" ]; then
+    export PATH=~/Apps/jdk1.6.0_43/bin/:$PATH
+    alias emacs="~/Apps/emacs/bin/emacs"
+fi
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">_sftpfs(){
+    local cur prev opts base
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    #  The basic options we'll complete.
+    opts="mount umount"
+
+    #  Complete the arguments to some of the basic commands.
+    case "${prev}" in
+	mount)
+	    local running=$(grep ^Host $HOME/.ssh/config | awk '{print $2}' | grep -v \*)
+	    COMPREPLY=( $(compgen -W "${running}" -- ${cur}) )
+	    return 0
+	    ;;
+	umount)
+	    local running=$(ls --color=none /media/nakkaya/ | grep -v '\.')
+	    COMPREPLY=( $(compgen -W "${running}" -- ${cur}) )
+	    return 0
+	    ;;
+	*)
+	    ;;
+    esac
+
+    COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+    return 0
+}
+complete -F _sftpfs sftpfs
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">case "$OSTYPE" in
+    linux-gnu)
+	    mount_point="/media/nakkaya/$2"
+	;;
+    darwin*)
+	    mount_point="/Volumes/$2"            
+	;;
+esac
+echo "Location -&gt; " $mount_point
+
+case "${1}" in
+    mount)
+	    if [ -d "$mount_point" ]; then
+		echo "Already Mounted"
+	    fi
+	    mkdir $mount_point
+	    mount_command="sshfs $2:/ $mount_point -oauto_cache,reconnect,compression=no,follow_symlinks,Ciphers=arcfour"
+	    if [ ! -z $3 ]
+	    then
+		echo "Port $3"
+		mount_command="$mount_command,port=$3"
+		echo $mount_command
+	    fi 
+	    eval $mount_command
+	    ;;
+    umount)
+	    echo "Unmounting" $2
+
+	    if [ ! -d "$mount_point" ]; then
+		echo "Not Mounted"
+	    fi
+
+	    if umount $mount_point; then
+		rm -rf $mount_point
+	    fi
+	    ;;
+    *)
+	    ;;
+esac
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">_vm() {
+    local cur prev opts base
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    #  The basic options we'll complete.
+    opts="start start-head stop unplug running"
+
+    #  Complete the arguments to some of the basic commands.
+    case "${prev}" in
+	start)
+	    local running=$(for x in `VBoxManage list vms | awk '{print $1}'`; do echo ${x} ; done )
+	    COMPREPLY=( $(compgen -W "${running}" -- ${cur}) )
+	    return 0
+	    ;;
+	start-head)
+	    local running=$(for x in `VBoxManage list vms | awk '{print $1}'`; do echo ${x} ; done )
+	    COMPREPLY=( $(compgen -W "${running}" -- ${cur}) )
+	    return 0
+	    ;;
+	stop)
+	    local names=$(for x in `VBoxManage list runningvms | awk '{print $1}'`; do echo ${x} ; done )
+	    COMPREPLY=( $(compgen -W "${names}" -- ${cur}) )
+	    return 0
+	    ;;
+	unplug)
+	    local names=$(for x in `VBoxManage list runningvms | awk '{print $1}'`; do echo ${x} ; done )
+	    COMPREPLY=( $(compgen -W "${names}" -- ${cur}) )
+	    return 0
+	    ;;
+	*)
+	    ;;
+    esac
+
+    COMPREPLY=($(compgen -W "${opts}" -- ${cur}))
+    return 0
+}
+complete -F _vm vm
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">case "${1}" in
+    start)
+	    echo "Starting" $2
+	    VBoxHeadless --startvm $2 --vrde off &amp;
+	    disown
+	    return 0
+	    ;;
+    start-head)
+	    echo "Starting" $2
+	    VBoxManage startvm $2 &amp;
+	    disown
+	    return 0
+	    ;;
+    stop)
+	    echo "Stopping" $2
+	    VBoxManage controlvm $2 acpipowerbutton
+	    return 0
+	    ;;
+    unplug)
+	    echo "Unplugging" $2
+	    VBoxManage controlvm $2 poweroff
+	    return 0
+	    ;;
+    running)
+	    VBoxManage list runningvms
+	    return 0
+	    ;;
+    *)
+	    ;;
+esac
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">/usr/bin/chromium-browser --app=https://base.nakkaya.com/
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-sh"># if running bash
+if [ -n "$BASH_VERSION" ]; then
+    # include .bashrc if it exists
+    if [ -f "$HOME/.bashrc" ]; then
+	. "$HOME/.bashrc"
+    fi
+fi
+
+if [ -d "$HOME/.bin/" ] ; then
+    PATH="$HOME/.bin/:$PATH"
+fi
+</pre>
+</div>
+</div><div id="disqus"></div></div><div id="footer"><a href="/rss-feed"> RSS Feed</a><p>&copy; 2014<a href="http://sanatrosa-daycare.com"> Celia Sherman</a></p></div></div></body></html>

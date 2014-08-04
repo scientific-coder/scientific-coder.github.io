@@ -1,0 +1,259 @@
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><meta name="description" /><meta content="xmonad xmobar window-manager" name="keywords" /><meta content="Celia Sherman Akkaya" name="author" /><link href="/images/favicon.ico" rel="icon" type="image/x-icon" /><link href="/images/favicon.ico" rel="shortcut icon" type="image/x-icon" /><link href="/default.css" rel="stylesheet" type="text/css" /><link href="/rss-feed" rel="alternate" title="Santa Rosa Day Care" type="application/rss+xml" /><script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script><title>Xmonad & Xmobar Configuration</title></head><body><div id="wrap"><div id="header"><h1><a href="/">Santa Rosa Day Care<span class="fade-small"> by Celia Sherman</span></a></h1><div class="pages"><a class="page" href="/">Home</a> | <a class="page" href="/archives.html">Archives</a> | <a class="page" href="/tags/">Tags</a> | <a class="page" href="/contact.html" rel="author">About</a><form action="http://www.google.com/search" id="searchform" method="get"><div><input class="box" id="s" name="q" type="text" /><input name="sitesearch" type="hidden" value="santarosa-daycare.com" /></div></form></div></div><div id="content"><div id="post"><h2 class="page-title">Xmonad & Xmobar Configuration</h2><div class="org-src-container">
+
+<pre class="src src-fundamental">import XMonad
+import XMonad.Hooks.DynamicLog
+import XMonad.Hooks.ManageDocks
+import XMonad.Util.Run(spawnPipe)
+import XMonad.Util.EZConfig(additionalKeys)
+import System.IO
+import XMonad.Layout.Spacing
+import XMonad.Layout.NoBorders
+import XMonad.Actions.CopyWindow
+import XMonad.Hooks.SetWMName
+import XMonad.Hooks.ICCCMFocus
+import XMonad.Actions.GridSelect
+import XMonad.Prompt
+import XMonad.Prompt.Shell
+import qualified XMonad.Layout.IndependentScreens as LIS
+import XMonad.Actions.Warp
+import XMonad.Actions.CycleWS
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-fundamental">toggleMonitor = do
+  screencount &lt;- LIS.countScreens
+  if screencount &gt; 1
+   then spawn "xrandr --output HDMI1 --off; /bin/bash ~/.xmonad/init.sh"
+   else spawn "xrandr --output HDMI1 --primary --auto --rotate normal --pos 0x0 --output eDP1 --auto  --rotate normal  --right-of HDMI1; /bin/bash ~/.xmonad/init.sh"
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-fundamental">myTerminal = "urxvt -tr +sb -fg white -bg black -tint white -sh 15 -fade 10 -fadecolor black -pr black -pr2 white -fn \"xft:Monaco-11\""
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-fundamental">myWorkspaces = ["1:emacs","2:web","3:music","4:video","5","6","7","8","9","0"]
+</pre>
+</div>
+
+<p>
+&#x2013; To find the property name associated with a program, use
+&#x2013; &gt; xprop | grep WM<sub>CLASS</sub>
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-fundamental">myManageHook = composeAll
+	       [className =? "java-lang-Thread" --&gt; doFloat,
+		className =? "sun-awt-X11-XFramePeer" --&gt; doFloat,
+		className =? "clojure-main" --&gt; doFloat,
+		className =? "Vlc" --&gt; doFloat,
+		className =? "avplay" --&gt; doFloat,
+		className =? "FlightGear" --&gt; doFloat,
+		className =? "osgViewer" --&gt; doFloat,
+		className =? "VirtualBox" --&gt; doFloat,
+		className =? "Gnome-contacts" --&gt; doFloat,
+		className =? "Steam" --&gt; doFloat,
+		className =? "Wine" --&gt; doFloat,
+		className =? "Emacs24" --&gt; doShift "1:emacs",
+		className =? "Google-chrome" --&gt; doShift "2:web",
+		className =? "Firefox" --&gt; doShift "2:web",
+		className =? "Rhythmbox" --&gt; doShift "3:music",
+		className =? "Audacious" --&gt; doShift "3:music",
+		className =? "Vlc" --&gt; doShift "4:video"
+	       ]
+	       &lt;+&gt; manageDocks &lt;+&gt; manageHook defaultConfig
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-fundamental">myLayutHook = smartBorders $ lessBorders OnlyFloat $  avoidStruts $ layoutHook defaultConfig ||| noBorders Full
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-fundamental">myModMask = mod4Mask -- mod4mask is the windows key
+myKeyBindings = [((mod4Mask, xK_p), shellPrompt defaultXPConfig)
+		, ((0, xK_Print), spawn "gnome-screenshot")
+		, ((mod4Mask, xK_v ), windows copyToAll) -- @@ Make focused window always visible
+		, ((mod4Mask .|. shiftMask, xK_v ),  killAllOtherCopies) -- @@ Toggle window state back
+		, ((mod4Mask .|. shiftMask, xK_m ),  toggleMonitor)
+		, ((mod4Mask .|. shiftMask, xK_h ),  spawn "nautilus --no-desktop --browser")
+		-- Suspend
+		, ((mod4Mask .|. shiftMask, xK_s ),  spawn "gnome-screensaver-command -l; dbus-send --print-reply --system --dest=org.freedesktop.UPower /org/freedesktop/UPower org.freedesktop.UPower.Suspend")
+		-- Lock Screen
+		, ((mod4Mask .|. controlMask, xK_s ),  spawn "gnome-screensaver-command -l")
+		-- Hibernate
+		, ((mod4Mask .|. controlMask, xK_z ),  spawn "gnome-screensaver-command -l; dbus-send --system --print-reply --dest=\"org.freedesktop.UPower\" /org/freedesktop/UPower org.freedesktop.UPower.Hibernate")
+		, ((mod4Mask, xK_F1 ), spawn "xbacklight -dec 10")
+		, ((mod4Mask, xK_F2 ), spawn "xbacklight -inc 10")
+		, ((mod4Mask, xK_F7 ), spawn "cmus-remote -r")
+		, ((mod4Mask, xK_F8 ), spawn "cmus-remote -u")
+		, ((mod4Mask, xK_F9 ), spawn "cmus-remote -n")
+		, ((mod4Mask, xK_F10 ), spawn "amixer -D pulse set Master toggle")
+		, ((mod4Mask, xK_F11 ), spawn "amixer -D pulse set Master 3%-")
+		, ((mod4Mask, xK_F12 ), spawn "amixer -D pulse set Master 3%+")
+		, ((mod4Mask, xK_s), goToSelected defaultGSConfig)
+		, ((mod4Mask, xK_g), spawnSelected defaultGSConfig ["emacs","firefox","rhythmbox","gnome-control-center sound","gnome-control-center","virtualbox","google-chrome --incognito"])
+		, ((mod4Mask, xK_z), warpToWindow (1/2) (1/2)) -- @@ Move pointer to currently focused window
+		, ((mod4Mask, xK_a),     toggleWS)
+		]
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-fundamental">main = do
+
+xmproc &lt;- spawnPipe "/bin/bash ~/.xmonad/init.sh"
+
+xmonad $ defaultConfig
+    { manageHook = myManageHook
+    , terminal = myTerminal
+    , workspaces = myWorkspaces
+    , borderWidth = 1
+    , normalBorderColor  = "#303030"
+    , focusedBorderColor = "#4D8686"
+    , modMask = myModMask
+    , layoutHook = myLayutHook
+    , logHook = takeTopFocus
+    , startupHook = setWMName "LG3D"
+    } `additionalKeys` myKeyBindings
+</pre>
+</div>
+
+<p>
+xmobarrc File,
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-fundamental">Config { font = "xft:Monaco:size=9:bold:antialias=true"
+       , bgColor = "black"
+       , fgColor = "grey"
+       , position = TopW L 95
+       , lowerOnStart = True
+       , commands = [ Run Weather "LCEN" ["-t","&lt;tempC&gt;°C","-L","18","-H","25","--normal","green","--high","red","--low","lightblue"] 3600
+		    , Run Network "eth0" ["-t","&lt;dev&gt;: &lt;rx&gt;KB &lt;tx&gt;KB","-L","0","-H","32","--normal","green","--high","red"] 10
+		    , Run Network "wlan0" ["-t","&lt;dev&gt;: &lt;rx&gt;KB &lt;tx&gt;KB","-L","0","-H","32","--normal","green","--high","red"] 10
+		    , Run Cpu ["-t","CPU: &lt;total&gt;%","-L","3","-H","50","--normal","green","--high","red"] 10
+		    , Run DiskIO [("/", "&lt;read&gt; &lt;write&gt;")] ["-l", "green", "--normal","orange","--high","red"] 10
+		    , Run Com "~/.xmonad/cpu_avg_temp.sh" [] "" 20
+		    , Run BatteryP ["BAT0"] ["-t","&lt;left&gt;% / &lt;timeleft&gt;","-L","50","-H","75","-h","green","-n","yell","-l","red","--", "-c", "energy_full"] 50
+		    , Run Memory ["-t","Mem: &lt;usedratio&gt;%"] 10
+		    , Run Swap [] 10
+		    , Run Date "%a %b %_d %H:%M" "date" 10
+		    ]
+       , sepChar = "%"
+       , alignSep = "}{"
+       , template = "%cpu% %~/.xmonad/cpu_avg_temp.sh% | %memory% %swap% | I/O %diskio% | %eth0% - %wlan0% | %battery%  }{ &lt;fc=#ee9a00&gt;%date%&lt;/fc&gt; %LCEN%"
+       }
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">function killAll (){
+    for PID in `pgrep $1`; do
+	kill ${PID} &gt; /dev/null &amp;
+    done
+}
+
+killAll xmobar
+killAll trayer
+killAll nm-applet
+killAll bluetooth-applet
+killAll keynav
+
+#/usr/bin/xmobar ~/.xmobarrc &amp;
+/usr/bin/trayer --edge top --align right --SetDockType true --widthtype percent --width 5 --transparent true --tint 0x000000 --height 20 &amp;
+~/.bin/caps-setup &amp;
+~/.bin/disable-touch-tap &amp;
+nm-applet &amp;
+bluetooth-applet &amp;
+keynav &amp;
+
+if [ -f ~/Dropbox/Photos/Misc/Wallpaper/Tgg54.jpeg ]; then
+    feh --bg-fill ~/Dropbox/Photos/Misc/Wallpaper/Tgg54.jpeg &amp;
+else
+    xsetroot -solid black &amp;
+fi
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-fundamental">Left cut-left
+Down cut-down
+Up cut-up
+Right cut-right
+control+Left move-left
+control+Down move-down
+control+Up move-up
+control+Right move-right
+space warp,click 1,end
+shift+space warp,click 3,end
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-fundamental">Xft.dpi:                      110
+Xft.antialias:                true
+Xft.hinting:                  true
+Xft.hintstyle:                hintfull
+Xft.rgba:                     rgb
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-fundamental">urxvt*urlLauncher:  firefox
+urxvt*matcher.button:  1
+urxvt*perl-ext-common:  default,matcher,searchable-scrollback
+urxvt.matcher.pattern.1:  \\bwww\\.[\\w-]\\.[\\w./?&amp;@#-]*[\\w/-]
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-fundamental">#/bin/bash
+
+synclient TapButton1=0
+synclient TapButton2=0
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-sh">#!/bin/bash
+
+#disable function keys
+#echo 2 | sudo tee /sys/module/hid_apple/parameters/fnmode
+
+#reset everything
+setxkbmap -model pc105 -layout us
+
+#replace caps and control
+xmodmap -e "remove Lock = Caps_Lock"
+xmodmap -e "keysym Caps_Lock = Control_L"
+xmodmap -e "add Control = Control_L"
+
+if [ `hostname -s` = "buntu" ]; then
+    #Exchange left Alt and left Win
+    xmodmap -e "remove mod1 = Alt_L"
+    xmodmap -e "remove mod4 = Super_L"
+    xmodmap -e "add mod1 = Super_L"
+    xmodmap -e "add mod4 = Alt_L"
+fi
+</pre>
+</div>
+</div><div id="disqus"></div></div><div id="footer"><a href="/rss-feed"> RSS Feed</a><p>&copy; 2014<a href="http://sanatrosa-daycare.com"> Celia Sherman</a></p></div></div></body></html>

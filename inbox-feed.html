@@ -1,0 +1,90 @@
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml"><head><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><meta content="A tool for retrieving content from RSS/ATOM feeds and mailing it." name="description" /><meta content="rss atom feed email imap" name="keywords" /><meta content="Celia Sherman Akkaya" name="author" /><link href="/images/favicon.ico" rel="icon" type="image/x-icon" /><link href="/images/favicon.ico" rel="shortcut icon" type="image/x-icon" /><link href="/default.css" rel="stylesheet" type="text/css" /><link href="/rss-feed" rel="alternate" title="Santa Rosa Day Care" type="application/rss+xml" /><script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script><title>inbox-feed - RSS/Atom to Email</title></head><body><div id="wrap"><div id="header"><h1><a href="/">Santa Rosa Day Care<span class="fade-small"> by Celia Sherman</span></a></h1><div class="pages"><a class="page" href="/">Home</a> | <a class="page" href="/archives.html">Archives</a> | <a class="page" href="/tags/">Tags</a> | <a class="page" href="/contact.html" rel="author">About</a><form action="http://www.google.com/search" id="searchform" method="get"><div><input class="box" id="s" name="q" type="text" /><input name="sitesearch" type="hidden" value="santarosa-daycare.com" /></div></form></div></div><div id="content"><div id="post"><h2 class="page-title">inbox-feed - RSS/Atom to Email</h2><p>
+inbox-feed is a tool for delivering news from RSS feeds to your email
+program. It is an attempt to add some features that are missing from
+other RSS to email applications.
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Configuration</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Following is the sample configuration, by default configuration file
+is <b>./config.clj</b> but you change its name and location using command
+line options.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-clojure">[:smtp-creds {:to "user@domain.com"}
+
+ ;; :smtp-creds {:to "user@domain.com"
+ ;;              :host "smtp.gmail.com"
+ ;;              :user "user@gmail.com"
+ ;;              :pass "super_secret_pass"
+ ;;              :ssl :yes}
+
+ ;; :imap-creds ["imaps" "imap.gmail.com" "nurullah@nakkaya.com" "super_secret_pass"]
+
+ :feed-list [["http://news.ycombinator.com/rss" 15 "3cdbbd1e-5559-45d5-8dd6-d60408301580"]
+	     ["http://www.reddit.com/r/programming/.rss" 15 "780e3966-547c-40a7-855b-23161ceee8d3"]
+	     ;; when using IMAP
+	     ;; ["http://news.ycombinator.com/rss" 15 ["feeds" "hackernews"]]
+	     ]]
+</pre>
+</div>
+
+<p>
+Above setup will inject mails to local sendmail process
+alternatively you can use an SMTP server or you can provide IMAP
+credentials then message will be placed in folder/s. <b>feed-list</b>
+is a list of vectors at the very least it should contain a list of
+feed URLs rest is optional. Having the following structure,
+</p>
+
+<pre class="example">
+[url freq id name]
+</pre>
+
+<ul class="org-ul">
+<li>url - URL of the feed.
+</li>
+<li>freq - Optional. How often we should check the URL (Defaults to 60 mins)
+</li>
+<li>id - Optional string that will be appended to the email in <b>white</b>
+which allows you to create filters looking for that text or a
+vector of folder names defining a folder hierarchy entries should be
+placed in when using <i>IMAP</i>. ex. ["Feeds" "Feed"] will place the
+entries into the <i>Feed</i> folder under <i>Feeds</i> folder.
+</li>
+<li>name - Optional name that will override the name for the feed.
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Code</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+You can grab the latest version from the <a href="https://github.com/nakkaya/inbox-feed">repo</a>.
+</p>
+
+<p>
+For bug reports/fixes/help, see <a href="http://nakkaya.com/contact.html">contact</a>.
+</p>
+
+<p>
+Any feature requests are also welcome see <a href="http://nakkaya.com/contact.html">contact</a>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> License</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Beerware Revision 42
+</p>
+</div>
+</div>
+</div><div id="disqus"></div></div><div id="footer"><a href="/rss-feed"> RSS Feed</a><p>&copy; 2014<a href="http://sanatrosa-daycare.com"> Celia Sherman</a></p></div></div></body></html>
